@@ -7,12 +7,16 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.Commit;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 
+import static org.assertj.core.api.Assertions.*;
+
 @SpringBootTest
 @Transactional
+@Commit
 class QuerydslApplicationTests {
 
 	@Autowired
@@ -32,8 +36,8 @@ class QuerydslApplicationTests {
 				.selectFrom(qHello)
 				.fetchOne();
 
-		Assertions.assertThat(result).isEqualTo(hello);
+		assertThat(result).isEqualTo(hello);
 		// lombok 동작 확인
-		Assertions.assertThat(result.getId()).isEqualTo(hello.getId());
+		assertThat(result.getId()).isEqualTo(hello.getId());
 	}
 }
