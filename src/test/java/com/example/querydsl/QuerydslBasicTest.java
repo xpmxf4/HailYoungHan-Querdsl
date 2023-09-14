@@ -119,8 +119,18 @@ public class QuerydslBasicTest {
 //        results.getTotal();
 //        List<Member> content = results.getResults();
 
-        long total = queryFactory
-                .selectFrom(member)
-                .fetchCount();
+//        long total = queryFactory
+//                .selectFrom(member)
+//                .fetchCount();
+    }
+
+    @Test
+    public void count() {
+        Long totalCount = queryFactory
+                .select(member.count())
+                .from(member)
+                .fetchOne();
+
+        System.out.println("==============================totalCount = " + totalCount);
     }
 }
