@@ -13,6 +13,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 
+import static com.example.querydsl.entity.QMember.member;
+
 @SpringBootTest
 @Transactional
 public class QuerydslBasicTest {
@@ -58,11 +60,9 @@ public class QuerydslBasicTest {
 
     @Test
     public void startQuerydsl() {
-        QMember m = QMember.member;
-
         Member findMember = queryFactory
-                .selectFrom(m)
-                .where(m.username.eq("member1")) // 파라미터 바인딩 처리
+                .selectFrom(member)
+                .where(member.username.eq("member1")) // 파라미터 바인딩 처리
                 .fetchOne();
 
         Assertions.assertThat(findMember.getUsername())
