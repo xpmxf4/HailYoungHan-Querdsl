@@ -14,6 +14,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.Commit;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
@@ -25,6 +26,7 @@ import static org.assertj.core.api.Assertions.*;
 
 @SpringBootTest
 @Transactional
+@Commit
 public class QuerydslBasicTest {
 
     @Autowired
@@ -290,5 +292,56 @@ public class QuerydslBasicTest {
         assertThat(result)
                 .extracting("username")
                 .containsExactly("teamA", "teamB");
+    }
+
+    @Test
+    public void join_on_filtering() throws Exception {
+//        List<Member> result = queryFactory
+//                .select(member)
+//                .from(member.team, team)
+//                .where(team.name.eq("teamA"))
+//                .fetch();
+        List<Tuple> result = queryFactory
+                .select(member, team)
+                .from(member)
+                .leftJoin(member.team, team).on(team.name.eq("teamA"))
+                .fetch();
+
+        for (Tuple tuple : result) {
+            System.out.println("tuple = " + tuple);
+        }
+    }
+
+    @Test
+    public void join_on_no_relation() throws Exception {
+        em.persist(new Member("teamA"));
+        em.persist(new Member("teamB"));
+
+//        queryFactory
+//                .select(member, team)
+//                .from(member)
+//                .leftJoin(member.username).on(team.name)
+//                .fetch();
+
+        List<Tuple> result1 = queryFactory
+                .select(member, team)
+                .from(member)
+                .leftJoin(team).on(member.username.eq(team.name))
+                .fetch();
+
+        List<Tuple> result2 = queryFactory
+                .select(member, team)
+                .from(member)
+                .leftJoin(member.team, team)
+                .on(member.username.eq(team.name))
+                .fetch();
+
+        for (Tuple tuple : result1) {
+            System.out.println("tuple = " + tuple);
+        }
+        System.out.println("========================");
+        for (Tuple tuple : result2) {
+            System.out.println("tuple = " + tuple);
+        }
     }
 }
