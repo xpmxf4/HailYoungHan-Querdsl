@@ -17,7 +17,6 @@ public class Member {
     public Long id;
     private String username;
     private int age;
-
     @ManyToOne
     @JoinColumn(name = "team_id")
     private Team team;

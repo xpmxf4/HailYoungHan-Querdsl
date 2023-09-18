@@ -1,21 +1,22 @@
 package com.example.querydsl;
 
 import com.example.querydsl.entity.Member;
+import com.example.querydsl.entity.QMember;
 import com.example.querydsl.entity.QTeam;
 import com.example.querydsl.entity.Team;
 import com.querydsl.core.QueryResults;
 import com.querydsl.core.Tuple;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import org.assertj.core.api.AbstractListAssert;
 import org.assertj.core.api.Assertions;
+import org.assertj.core.api.ObjectAssert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.Commit;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
-
 import java.util.List;
 
 import static com.example.querydsl.entity.QMember.member;
@@ -252,16 +253,22 @@ public class QuerydslBasicTest {
      * 팀 A에 소속된 모든 회원
      */
     @Test
-    public void join() throws Exception {
+    public void join() {
+        QMember member = QMember.member;
+        QTeam team = QTeam.team;
+
         List<Member> result = queryFactory
                 .selectFrom(member)
                 .join(member.team, team)
                 .where(team.name.eq("teamA"))
                 .fetch();
 
-        assertThat(result)
+        AbstractListAssert<?, List<?>, Object, ObjectAssert<Object>> whatIsThis = assertThat(result)
                 .extracting("username")
                 .containsExactly("member1", "member2");
+//        System.out.println("================");
+//        System.out.println(whatIsThis.info);
+//        System.out.println("===============");
     }
 
     /**
@@ -270,6 +277,7 @@ public class QuerydslBasicTest {
      */
     @Test
     public void theta_join() {
+        // username 이 teamA, teamB 인 학습을 위한 억지 경우
         em.persist(new Member("teamA"));
         em.persist(new Member("teamB"));
 
@@ -279,7 +287,6 @@ public class QuerydslBasicTest {
                 .where(member.username.eq(team.name))
                 .fetch();
 
-//        System.out.println("==================================result = " + result);
         assertThat(result)
                 .extracting("username")
                 .containsExactly("teamA", "teamB");
