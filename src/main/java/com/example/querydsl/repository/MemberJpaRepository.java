@@ -5,6 +5,8 @@ import com.example.querydsl.dto.MemberTeamDto;
 import com.example.querydsl.dto.QMemberTeamDto;
 import com.example.querydsl.entity.Member;
 import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.Predicate;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
@@ -78,8 +80,6 @@ public class MemberJpaRepository {
         if (condition.getAgeLoe() != null) {
             builder.and(member.age.loe(condition.getAgeLoe()));
         }
-        System.out.println("=====================condition = " + condition);
-        System.out.println("=====================builder = " + builder);
 
         return queryFactory
                 .select(new QMemberTeamDto(
@@ -94,4 +94,41 @@ public class MemberJpaRepository {
                 .where(builder)
                 .fetch();
     }
+
+    public List<MemberTeamDto> search(MemberSearchCondition condition) {
+
+        return queryFactory
+                .select(new QMemberTeamDto(
+                        member.id,
+                        member.username,
+                        member.age,
+                        team.id,
+                        team.name
+                ))
+                .from(member)
+                .leftJoin(member.team, team)
+                .where(usernameEq(condition.getUsername()),
+                        teamNameEq(condition.getTeamName()),
+                        ageGoe(condition.getAgeGoe()),
+                        ageLoe(condition.getAgeLoe()))
+                .fetch();
+
+    }
+
+    private BooleanExpression usernameEq(String username) {
+        return hasText(username) ? member.username.eq(username) : null;
+    }
+
+    private BooleanExpression teamNameEq(String teamName) {
+        return hasText(teamName) ? team.name.eq(teamName) : null;
+    }
+
+    private BooleanExpression ageLoe(Integer ageLoe) {
+        return ageLoe == null ? null : member.age.loe(ageLoe);
+    }
+
+    private BooleanExpression ageGoe(Integer ageGoe) {
+        return ageGoe == null ? null : member.age.goe(ageGoe);
+    }
+
 }
