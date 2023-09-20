@@ -12,9 +12,9 @@ spring:
       hibernate:
         format_sql: true
         use_sql_comments: true
-#        show_sql: true # console ? ??
+#        show_sql: true # console
 
 logging:
   level:
-    org.hibernate.sql: debug # logger ? ??
+    org.hibernate.sql: debug # logger
     org.hibernate.type: trace
