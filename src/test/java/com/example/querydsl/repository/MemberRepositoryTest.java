@@ -65,5 +65,4 @@ class MemberRepositoryTest {
         assertThat(result).extracting("username")
                 .containsExactly("member4");
     }
-
 }
